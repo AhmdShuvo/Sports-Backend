@@ -35,7 +35,7 @@ async function run() {
 
           
 
-      // Add New Car to Data base //
+      // Add New to Data base //
       app.post("/matches",async(req,res)=>{
 
         const product=req.body;
@@ -78,80 +78,18 @@ res.send(result)
        
        });
 
-      //  Get Admins ///
-
-      app.get('/user/admin/:email', async(req,res)=>{
-
-         const email= req.params.email;
-          let isAdmin=false
-         const query={email:email}
-         const user=await UsersCollection.findOne(query);
-
-         if(user?.role==="admin"){
-           isAdmin=true
-
-         }
-
-         res.json({admin : isAdmin})
-      })
-
-        //  delete order as Admin ///
-
-        app.delete("/orders/:id",async(req,res)=>{
-
+        // Get Single Game by id
+        app.get(`/sport/:id`,async(req,res)=>{
           const id=req.params.id;
-
+          console.log("id", id);
           const query={_id: Objectid(id)}
           console.log(id);
-          const result=await purchaseCollection.deleteOne(query);
-
-          res.send(result)
-      });
-
-      //  change pending to active //
-      app.put("/orders/:id",async(req,res)=>{
-        const id=req.params.id;
-        console.log('id ',id);
-      
-      const updateUser=req.body;
-    console.log(updateUser);
-       const filter={_id: Objectid(id)}
-       const options = { upsert: false };
-       const updateDoc = {
-        $set: {
-          status: `Shipped`
-        },
-      };
-
-      const result= await purchaseCollection.updateMany(filter,updateDoc,options)
-     
+          const result=await matchesCollection.findOne(query);
+          res.json(result);
+        })
 
 
-       res.json(result)
-    })
-
-      //  update Admin ROle ///
-
-      app.put('/users',async(req,res)=>{
-
-        const user=req.body;
-        const filter={email:user.email}
-       
-
-        console.log(user.email);
-
-        const updateDoc = {
-          $set: {
-            role: "admin"
-          },
-        };
-
-        const result=await UsersCollection.updateOne(filter,updateDoc);
-
-      res.json(result)
-       
-      })
-
+    
       //  Update For Google USers///
       app.post('/users',async(req,res)=>{
 
@@ -232,15 +170,6 @@ res.send(result)
 
             const result=await cursor.toArray()
 
-        res.json(result)
-      })
-
-      // get all Orders //
-
-      app.get("/orders",async (req,res)=>{
-
-        const cursor= purchaseCollection.find({});
-        const result =await cursor.toArray()
         res.json(result)
       })
     } finally {
